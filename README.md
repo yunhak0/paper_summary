@@ -6,7 +6,7 @@ Factorization Meets the Neighborhood: a Multifaceted Collaborative Filtering Mod
 
 ### Keywords
 
-collaborative filtering, recommemder systems, explicit feedback, matrix factorization, weighborhood model, latent factor model, integrated model approach
+collaborative filtering, recommemder systems, explicit feedback, matrix factorization, neighborhood model, latent factor model, integrated model approach
 
 
 ## Summary
