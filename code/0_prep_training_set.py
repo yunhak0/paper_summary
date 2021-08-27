@@ -23,15 +23,16 @@ def tar_training_set(root_dir):
     keys = []
     chunk = []
 
-    # Read 'combined' files and Write 'training_set_*'
+    # Read 'combined' files and Write 'mv_*'
     for f in tqdm(files):
         with open(f, 'r') as file:
             data = file.readlines()
         for l in data:
             if bool(re.search(':', l)):
                 idx = str(int(re.sub(":\n", "", l)) - 1)
+                idx = idx.rjust(7, '0')
                 out_file = os.path.join(training_set_dir,
-                                        'training_set_' + idx + '.txt')
+                                        'mv_' + idx + '.txt')
                 if i != 0:
                     with open(out_file, 'w') as out:
                         out.writelines(chunk) 
@@ -41,8 +42,9 @@ def tar_training_set(root_dir):
 
     # Final Set
     idx = str(int(idx) + 1)
+    idx = idx.rjust(7, '0')
     out_file = os.path.join(training_set_dir,
-                            'training_set_' + idx + '.txt')
+                            'mv_' + idx + '.txt')
     with open(out_file, 'w') as out:
         out.writelines(chunk)
     
