@@ -4,7 +4,7 @@ Factorization Meets the Neighborhood: a Multifaceted Collaborative Filtering Mod
 * Authers: Yehuda Koren
 * Proceedings of the 14th ACM SIGKDD (August 2008)
 
-### Keywords
+## Keywords
 
 collaborative filtering, recommemder systems, explicit feedback, matrix factorization, neighborhood model, latent factor model, integrated model approach
 
