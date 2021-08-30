@@ -87,8 +87,8 @@ def import_training_set(path: str,
         scipy.sparse.csr.csr_matrix: Ratings Sparse Matrix
     """    
     R = lil_matrix((n_users, n_movies), dtype=np.uint8)
-
-    input_tar = tarfile.open(path+'/'+training_file)
+    file = os.path.join(path, training_file)
+    input_tar = tarfile.open(file)
     for m in tqdm(input_tar.getmembers()):
         f = input_tar.extractfile(m)
         if f is not None:
@@ -118,19 +118,40 @@ def import_movie_info(path: str,
     Returns:
         pd.DataFrame: [description]
     """    
-    file = path+'/'+movie_file
+    file = os.path.join(path, movie_file)
     with open(file, 'r', encoding="ISO-8859-1") as f:
         d = f.readlines()
-    k = [re.sub('\n', '', m) for m in d]
+    d = [re.sub('\n', '', m) for m in d]
     years = [re.sub(',', '', re.findall(',[0-9]*', m)[0])
-        for m in k]
-    titles = [re.sub('[0-9]*,', '', m) for m in k]
+             for m in d]
+    titles = [re.sub('[0-9]*,', '', m) for m in d]
 
     movie_titles = pd.DataFrame({'YearOfRelease': years,
                                 'Title': titles})
     movie_titles.index.name = 'MovieID'
 
     return movie_titles
+
+def import_test_set(path: str,
+                    file_name: str):
+    file = os.path.join(path, file_name)
+    with open(file, 'r') as f:
+        d = f.readlines()
+    d = [re.sub('\n', '', m) for m in d]
+    l_movies = []
+    l_users = []
+    for l in d:
+        if bool(re.search(':', l)):
+            MovieID = int(re.sub(':', '', l)) - 1
+            continue
+        else:
+            l = l.split(',')
+            CustomerID = int(l[0]) - 1  
+        l_movies.append(MovieID)
+        l_users.append(CustomerID)
+    test_set = pd.DataFrame({'MovieID': l_movies,
+                             'CustomerID': l_users})
+    return test_set
 
 #-----------------------------------------------------------------------
 if __name__ == '__main__':
