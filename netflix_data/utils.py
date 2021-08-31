@@ -70,7 +70,7 @@ def import_training_set(path: str,
                         n_users: int=2649429,
                         n_movies: int=17770,
                         training_file: str='training_set.tar'):
-    """Import training data as sparse matrix from Netflix Prize
+    """Import training data from Netflix Prize as sparse matrix
 
     It uses 'scipy.sparse.lil_matrix' and 'scipy.sparse.csr_matrix'.
 
@@ -133,7 +133,18 @@ def import_movie_info(path: str,
     return movie_titles
 
 def import_test_set(path: str,
-                    file_name: str):
+                    file_name: str) -> pd.DataFrame:
+    """Import test data from Netflix Prize as pandas.DataFrame
+
+    Args:
+        path (str): file path of test set files.
+        file_name (str): file name of test set.
+        e.g. 'probe.txt' or 'qualifying.txt'
+
+    Returns:
+        pd.DataFrame: DataFrame of 'MovieID' and 'CustomerID'
+        for test
+    """    
     file = os.path.join(path, file_name)
     with open(file, 'r') as f:
         d = f.readlines()
