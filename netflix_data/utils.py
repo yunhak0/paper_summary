@@ -32,7 +32,6 @@ def tar_training_set(path: str):
 
     # Set up the inputs
     i = 0
-    keys = []
     chunk = []
 
     # Read 'combined' files and Write 'mv_*'
@@ -85,7 +84,7 @@ def import_training_set(path: str,
 
     Returns:
         scipy.sparse.csr.csr_matrix: Ratings Sparse Matrix
-    """    
+    """
     R = lil_matrix((n_users, n_movies), dtype=np.uint8)
     file = os.path.join(path, training_file)
     input_tar = tarfile.open(file)
