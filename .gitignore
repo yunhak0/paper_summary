@@ -133,3 +133,6 @@ netflix_data/*.txt
 netflix_data/*.csv
 netflix_data/*.pl
 netflix_data/*.tar
+netflix_data/*.npz
+
+movielens_data/*.*
