@@ -126,7 +126,7 @@ def import_movie_info(path: str,
     titles = [re.sub('[0-9]*,', '', m) for m in d]
 
     movie_titles = pd.DataFrame({'YearOfRelease': years,
-                                'Title': titles})
+                                 'Title': titles})
     movie_titles.index.name = 'MovieID'
 
     return movie_titles
