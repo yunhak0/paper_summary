@@ -16,7 +16,7 @@ def get_index(rating: sparse.csr_matrix) -> dict:
     dict_idx = {'user': [], 'item':[], 'data_idx': []}
     for u, (begin, end) in tqdm(enumerate(zip(rating.indptr,
                                               rating.indptr[1:])),
-                                total=len(rating.indptr)):
+                                total=len(rating.indptr)-1):
         dict_idx['user'].append(u)
         dict_idx['item'].append(list(rating.indices[begin:end]))
         dict_idx['data_idx'].append(list(range(begin, end)))
