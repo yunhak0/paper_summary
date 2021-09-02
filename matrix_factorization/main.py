@@ -2,7 +2,7 @@ import os
 import re
 import numpy as np
 from scipy import sparse
-from SVD_integrated import SVDpp
+from SVD_integrated import SVD, SVDpp, SVD_integrated
 
 if __name__ == '__main__':
     movielens_dir = './movielens_data'
@@ -39,5 +39,11 @@ if __name__ == '__main__':
 
     test = sparse.csr_matrix((test_r, (test_u, test_i)))
 
-    svd_pp = SVDpp.SVDpp(train=train, test=test, random_state=89)
-    svd_pp.fit()
+    # svd = SVD.SVD(train=train, test=test, random_state=89)
+    # svd.fit()
+
+    # svd_pp = SVDpp.SVDpp(train=train, test=test, random_state=89)
+    # svd_pp.fit()
+
+    svd_integrated = SVD_integrated.SVD_integrated(train=train, test=test, random_state=89)
+    svd_integrated.fit()

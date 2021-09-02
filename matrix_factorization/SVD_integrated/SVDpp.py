@@ -50,7 +50,7 @@ class SVDpp():
             for user, item matrix and implicit feedback. Defaults to 0.015.
             n_factor (int): the number of factors. Defaults to 50.
             random_state (int): RandomState instance or None. Defaults to None.
-        """        
+        """
         # Input
         # explicit feedback
         self.R = train
@@ -96,7 +96,7 @@ class SVDpp():
     def fit(self):
         """
         Training the SVD++ model
-        """        
+        """
         start = datetime.now()
         R_coo = self.R.tocoo()
         R_test_coo = self.R_test.tocoo()
@@ -172,7 +172,7 @@ class SVDpp():
 
         Returns:
             float or List[float]: predicted rating of user u and item i.
-        """        
+        """
         b_ui = self.mu + self.b_u[u] + self.b_i[i] 
         q_i_T = self.q_i[i].T
         p_u_ = self.p_u[u] + np.sum(self.y_j[N_u], axis=0)/np.sqrt(len(N_u))
@@ -193,7 +193,7 @@ class SVDpp():
         Returns:
             floats: gradients and error of user u and item i.
             d_bu, d_bi, d_qi, d_pu, d_yj, e_ui
-        """        
+        """
         hat_r_ui = self.predict(u, i, N_u)
         e_ui = r - hat_r_ui
 
@@ -222,7 +222,7 @@ class SVDpp():
             gradient descent is updated in the object itself:
             b_u, b_i, q_i, p_u, y_j.
 
-        """        
+        """
         d_bu, d_bi, d_qi, d_pu, d_yj, e_ui = self.gradient(u, i, r, N_u)
 
         self.b_u[u] = self.b_u[u] + self.gamma1 * d_bu

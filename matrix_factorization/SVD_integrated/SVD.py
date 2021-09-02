@@ -41,7 +41,7 @@ class SVD():
             Defaults to 0.005.
             n_factor (int): the number of factors. Defaults to 50.
             random_state (int): , RandomState instance or None. Defaults to None.
-        """        
+        """
         # Input
         # explicit feedback
         self.R = train
@@ -76,7 +76,7 @@ class SVD():
     def fit(self):
         """
         Training the SVD model
-        """        
+        """
         start = datetime.now()
         R_coo = self.R.tocoo()
         R_test_coo = self.R_test.tocoo()
@@ -149,7 +149,7 @@ class SVD():
 
         Returns:
             float or List[float]: predicted rating of user u and item i.
-        """        
+        """
         b_ui = self.mu + self.b_u[u] + self.b_i[i] 
         hat_r_ui = b_ui + np.dot(self.p_u[u], self.q_i[i].T)
         self.R_predicted[u, i] = hat_r_ui
@@ -167,7 +167,7 @@ class SVD():
         Returns:
             floats: gradients and error of user u and item i.
             d_bu, d_bi, d_qi, d_pu, e_ui
-        """        
+        """
         hat_r_ui = self.predict(u, i)
         e_ui = r - hat_r_ui
 
@@ -191,9 +191,9 @@ class SVD():
         Returns:
             float: prediction error of user u and item i.
             gradient descent is updated in the object itself:
-            b_u, b_i, q_i, p_u, y_j.
+            b_u, b_i, q_i, p_u.
 
-        """        
+        """
         d_bu, d_bi, d_qi, d_pu, e_ui = self.gradient(u, i, r)
 
         self.b_u[u] = self.b_u[u] + self.gamma * d_bu

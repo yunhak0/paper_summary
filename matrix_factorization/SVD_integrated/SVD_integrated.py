@@ -141,7 +141,7 @@ class SVD_integrated():
     def fit(self):
         """
         Training the SVD_integrated model
-        """        
+        """
         start = datetime.now()
 
         # Similarity
@@ -261,8 +261,8 @@ class SVD_integrated():
 
         Returns:
             floats: gradients and error of user u and item i.
-            d_bu, d_bi, d_qi, d_pu, d_yj, e_ui
-        """        
+            d_bu, d_bi, d_qi, d_pu, d_yj, d_wij, d_cij, e_ui
+        """
         hat_r_ui = self.predict(u, i, N_u, Rk_iu, Nk_iu)
         e_ui = r - hat_r_ui
 
@@ -291,13 +291,15 @@ class SVD_integrated():
             i (int): item i
             r (int): rating of user u and item i
             N_u (List[int]): All items for which user u provided an implicit feedback.
+            Rk_iu (List[int]): Similar k items of explicit feedback by user u
+            Nk_iu (List[int]): Similar k items of implicit feedback by user u
 
         Returns:
             float: prediction error of user u and item i.
             gradient descent is updated in the object itself:
-            b_u, b_i, q_i, p_u, y_j.
+            b_u, b_i, q_i, p_u, y_j, w_ij, c_ij.
 
-        """        
+        """
         d_bu, d_bi, d_qi, d_pu, d_yj, d_wij, d_cij, e_ui = self.gradient(
             u, i, r, N_u, Rk_iu, Nk_iu
         )
