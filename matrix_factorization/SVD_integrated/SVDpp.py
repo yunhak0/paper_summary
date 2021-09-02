@@ -1,7 +1,6 @@
 from datetime import datetime
 import numpy as np
 from scipy import sparse
-import matplotlib.pyplot as plt
 # import utils
 
 class SVDpp():
@@ -22,7 +21,7 @@ class SVDpp():
         lambda7 (float): regularizing term of gradient descent
         for user, item matrix and implicit feedback. Defaults to 0.015.
         n_factor (int): the number of factors. Defaults to 50.
-        random_state (int): , RandomState instance or None. Defaults to None.
+        random_state (int): RandomState instance or None. Defaults to None.
     """
     def __init__(self,
                  train,
@@ -50,7 +49,7 @@ class SVDpp():
             lambda7 (float): regularizing term of gradient descent
             for user, item matrix and implicit feedback. Defaults to 0.015.
             n_factor (int): the number of factors. Defaults to 50.
-            random_state (int): , RandomState instance or None. Defaults to None.
+            random_state (int): RandomState instance or None. Defaults to None.
         """        
         # Input
         # explicit feedback
@@ -71,8 +70,7 @@ class SVDpp():
         self.n_item = train.shape[1]
 
         # predict rating matrix
-        self.R_predicted = sparse.lil_matrix((self.n_user, self.n_item),
-                                             dtype=np.uint8)
+        self.R_predicted = sparse.lil_matrix((self.n_user, self.n_item))
 
         # Input constants
         self.epochs = epochs
@@ -92,7 +90,6 @@ class SVDpp():
         self.y_j = np.random.standard_normal((self.n_item, self.n_factor))
 
         # Loss
-        self.epoch_info = {}
         self.train_loss = {}
         self.test_loss = {}
 
@@ -235,10 +232,3 @@ class SVDpp():
         self.y_j[N_u] = self.y_j[N_u] + self.gamma2 * d_yj
 
         return e_ui
-    
-    # def plot_loss(self):
-    #     fig, ax = plt.subplot(1, 1, figsize=(10, 5))
-
-
-    #     ax.plot(list(self.train_loss.keys()), list(self.train_loss.))
-
