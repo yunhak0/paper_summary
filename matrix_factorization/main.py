@@ -8,7 +8,7 @@ if __name__ == '__main__':
     movielens_dir = './movielens_data'
 
     # Training set Preparation
-    with open(os.path.join(movielens_dir, 'ua.base'), 'r') as f:
+    with open(os.path.join(movielens_dir, 'u1.base'), 'r') as f:
         data = f.readlines()
 
     train_u = []
@@ -24,7 +24,7 @@ if __name__ == '__main__':
     train = sparse.csr_matrix((train_r, (train_u, train_i)))
 
     # Test set preparation
-    with open(os.path.join(movielens_dir, 'ua.test'), 'r') as f:
+    with open(os.path.join(movielens_dir, 'u1.test'), 'r') as f:
             data = f.readlines()
 
     test_u = []
