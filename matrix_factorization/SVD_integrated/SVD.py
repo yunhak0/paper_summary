@@ -112,10 +112,11 @@ class SVD():
             for u, i, r in zip(R_test_coo.row,
                                R_test_coo.col,
                                R_test_coo.data):
-                r_hat = self.predict(u, i)
-                test_error = r - r_hat
-                self.test_loss[epoch]['error'].append(test_error)
-                test_check_point += 1
+                if r > 0:
+                    r_hat = self.predict(u, i)
+                    test_error = r - r_hat
+                    self.test_loss[epoch]['error'].append(test_error)
+                    test_check_point += 1
 
             test_rmse = np.sqrt(
                 np.sum([e ** 2 for e in self.test_loss[epoch]['error']]) /
@@ -172,10 +173,11 @@ class SVD():
         e_ui = r - hat_r_ui
 
         # gradient
+        d_pu = e_ui * self.q_i[i] - self.lambda3 * self.p_u[u]
+        d_qi = e_ui * self.p_u[u] - self.lambda3 * self.q_i[i]
+
         d_bu = e_ui - self.lambda3 * self.b_u[u]
         d_bi = e_ui - self.lambda3 * self.b_i[i]
-        d_qi = e_ui * self.p_u[u] - self.lambda3 * self.q_i[i]
-        d_pu = e_ui * self.q_i[i] - self.lambda3 * self.p_u[u]
 
         return d_bu, d_bi, d_qi, d_pu, e_ui
 
@@ -196,9 +198,10 @@ class SVD():
         """
         d_bu, d_bi, d_qi, d_pu, e_ui = self.gradient(u, i, r)
 
+        self.p_u[u] = self.p_u[u] + self.gamma * d_pu
+        self.q_i[i] = self.q_i[i] + self.gamma * d_qi
+
         self.b_u[u] = self.b_u[u] + self.gamma * d_bu
         self.b_i[i] = self.b_i[i] + self.gamma * d_bi
-        self.q_i[i] = self.q_i[i] + self.gamma * d_qi
-        self.p_u[u] = self.p_u[u] + self.gamma * d_pu
 
         return e_ui

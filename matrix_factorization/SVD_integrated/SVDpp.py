@@ -133,11 +133,12 @@ class SVDpp():
             for u, i, r in zip(R_test_coo.row,
                                R_test_coo.col,
                                R_test_coo.data):
-                N_u = np.where(self.N[u].todense() != 0)[1]
-                r_hat = self.predict(u, i, N_u)
-                test_error = r - r_hat
-                self.test_loss[epoch]['error'].append(test_error)
-                test_check_point += 1
+                if r > 0:
+                    N_u = np.where(self.N[u].todense() != 0)[1]
+                    r_hat = self.predict(u, i, N_u)
+                    test_error = r - r_hat
+                    self.test_loss[epoch]['error'].append(test_error)
+                    test_check_point += 1
 
             test_rmse = np.sqrt(
                 np.sum([e ** 2 for e in self.test_loss[epoch]['error']]) /
@@ -198,12 +199,14 @@ class SVDpp():
         e_ui = r - hat_r_ui
 
         # gradient
-        d_bu = e_ui - self.lambda6 * self.b_u[u]
-        d_bi = e_ui - self.lambda6 * self.b_i[i]
+        d_pu = e_ui * self.q_i[i] - self.lambda7 * self.p_u[u]
         d_qi = e_ui * (self.p_u[u] + np.sum(self.y_j[N_u], axis=0)/np.sqrt(len(N_u))) \
                 - self.lambda7 * self.q_i[i]
-        d_pu = e_ui * self.q_i[i] - self.lambda7 * self.p_u[u]
+
         d_yj = e_ui * self.q_i[i]/np.sqrt(len(N_u)) - self.lambda7 * self.y_j[N_u]
+
+        d_bu = e_ui - self.lambda6 * self.b_u[u]
+        d_bi = e_ui - self.lambda6 * self.b_i[i]
 
         return d_bu, d_bi, d_qi, d_pu, d_yj, e_ui
 
@@ -225,10 +228,12 @@ class SVDpp():
         """
         d_bu, d_bi, d_qi, d_pu, d_yj, e_ui = self.gradient(u, i, r, N_u)
 
+        self.p_u[u] = self.p_u[u] + self.gamma2 * d_pu
+        self.q_i[i] = self.q_i[i] + self.gamma2 * d_qi
+
+        self.y_j[N_u] = self.y_j[N_u] + self.gamma2 * d_yj
+
         self.b_u[u] = self.b_u[u] + self.gamma1 * d_bu
         self.b_i[i] = self.b_i[i] + self.gamma1 * d_bi
-        self.q_i[i] = self.q_i[i] + self.gamma2 * d_qi
-        self.p_u[u] = self.p_u[u] + self.gamma2 * d_pu
-        self.y_j[N_u] = self.y_j[N_u] + self.gamma2 * d_yj
 
         return e_ui

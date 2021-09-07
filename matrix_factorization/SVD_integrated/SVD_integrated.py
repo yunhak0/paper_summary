@@ -185,14 +185,15 @@ class SVD_integrated():
             for u, i, r in zip(R_test_coo.row,
                                R_test_coo.col,
                                R_test_coo.data):
-                R_u = self.R[u].indices
-                N_u = self.N[u].indices
-                Rk_iu = [int(v) for v in np.intersect1d(R_u, self.sk_i[i])]
-                Nk_iu = [int(v) for v in np.intersect1d(N_u, self.sk_i[i])]
-                r_hat = self.predict(u, i, N_u, Rk_iu, Nk_iu)
-                test_error = r - r_hat
-                self.test_loss[epoch]['error'].append(test_error)
-                test_check_point += 1
+                if r > 0:
+                    R_u = self.R[u].indices
+                    N_u = self.N[u].indices
+                    Rk_iu = [int(v) for v in np.intersect1d(R_u, self.sk_i[i])]
+                    Nk_iu = [int(v) for v in np.intersect1d(N_u, self.sk_i[i])]
+                    r_hat = self.predict(u, i, N_u, Rk_iu, Nk_iu)
+                    test_error = r - r_hat
+                    self.test_loss[epoch]['error'].append(test_error)
+                    test_check_point += 1
 
             test_rmse = np.sqrt(
                 np.sum([e ** 2 for e in self.test_loss[epoch]['error']]) /
@@ -267,19 +268,22 @@ class SVD_integrated():
         e_ui = r - hat_r_ui
 
         # gradient
-        d_bu = e_ui - self.lambda6 * self.b_u[u]
-        d_bi = e_ui - self.lambda6 * self.b_i[i]
+        d_pu = e_ui * self.q_i[i] - self.lambda7 * self.p_u[u]
         d_qi = (e_ui * (self.p_u[u] + np.sum(self.y_j[N_u], axis=0) /
                         np.sqrt(len(N_u)))
                 - self.lambda7 * self.q_i[i])
-        d_pu = e_ui * self.q_i[i] - self.lambda7 * self.p_u[u]
+
         d_yj = e_ui * self.q_i[i]/np.sqrt(len(N_u)) - self.lambda7 * self.y_j[N_u]
+
         b_uj = self.mu + self.b_u[u] + self.b_i[Rk_iu]
         d_wij = (e_ui * (self.R[u, Rk_iu] - b_uj) /
                          np.sqrt(len(Rk_iu))
                  - self.lambda8 * self.w_ij[i, Rk_iu])
         d_cij = e_ui/np.sqrt(len(Nk_iu)) - self.lambda8 * self.c_ij[i, Nk_iu]
-        
+
+        d_bu = e_ui - self.lambda6 * self.b_u[u]
+        d_bi = e_ui - self.lambda6 * self.b_i[i]
+
         return d_bu, d_bi, d_qi, d_pu, d_yj, d_wij, d_cij, e_ui
 
     def gradient_descent(self, u, i, r, N_u, Rk_iu, Nk_iu):
@@ -304,12 +308,15 @@ class SVD_integrated():
             u, i, r, N_u, Rk_iu, Nk_iu
         )
 
-        self.b_u[u] = self.b_u[u] + self.gamma1 * d_bu
-        self.b_i[i] = self.b_i[i] + self.gamma1 * d_bi
-        self.q_i[i] = self.q_i[i] + self.gamma2 * d_qi
         self.p_u[u] = self.p_u[u] + self.gamma2 * d_pu
+        self.q_i[i] = self.q_i[i] + self.gamma2 * d_qi
+
         self.y_j[N_u] = self.y_j[N_u] + self.gamma2 * d_yj
+
         self.w_ij[i, Rk_iu] = self.w_ij[i, Rk_iu] + self.gamma3 * d_wij
         self.c_ij[i, Nk_iu] = self.c_ij[i, Nk_iu] + self.gamma3 * d_cij
+
+        self.b_u[u] = self.b_u[u] + self.gamma1 * d_bu
+        self.b_i[i] = self.b_i[i] + self.gamma1 * d_bi
 
         return e_ui
