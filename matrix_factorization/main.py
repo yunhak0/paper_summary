@@ -3,7 +3,7 @@ import re
 import numpy as np
 from scipy import sparse
 from SVD_integrated import SVD, Asymmetric_SVD, SVDpp, SVD_integrated
-from PMF import PMF
+from PMF import PMF, constrained_PMF
 
 if __name__ == '__main__':
     movielens_dir = './movielens_data'
@@ -56,6 +56,10 @@ if __name__ == '__main__':
     # svd_integrated = SVD_integrated.SVD_integrated(train=train, test=test, random_state=89)
     # svd_integrated.fit()
 
-    print('PMF -------------------------------------------------')
+    print('PMF -----------------------------------------------')
     pmf = PMF.PMF(train=train, test=test, random_state=89)
     pmf.fit()
+
+    print('Constrained PMF -------------------------------------')
+    constrained_pmf = constrained_PMF.constrained_PMF(train=train, test=test, random_state=89)
+    constrained_pmf.fit()
