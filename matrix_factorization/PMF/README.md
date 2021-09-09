@@ -20,3 +20,4 @@ In addition, it introduces latent similarity constraint matrix in the user matri
 
 ![](img/pmf1.png)
 
+[Detailed Summary](https://www.notion.so/Probabilistic-Matrix-Factorization-PMF-0462a6c455d94648a7f5b2deda0eaf6e)
