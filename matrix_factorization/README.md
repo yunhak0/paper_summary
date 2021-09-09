@@ -6,7 +6,7 @@ The implementation code is in each folder as well.
 
 The code can be run as following process.
 
-```python
+```bash
 python main.py
 ```
 
