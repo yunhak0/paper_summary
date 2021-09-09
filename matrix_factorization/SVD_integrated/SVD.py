@@ -132,11 +132,11 @@ class SVD():
                     eta = (datetime.now() - tmp_timestamp).total_seconds()
                 eta = divmod(eta, 60)
                 eta = str(int(eta[0])) + 'm ' + str(np.round(eta[1], 4)) + 's'
-                print("[Epoch: %d] Training RMSE: %.4f (ETA: %s), Test RMSE: %.4f" %
-                        (epoch + 1,
-                         self.train_loss[epoch]['RMSE'],
-                         eta,
-                         self.test_loss[epoch]['RMSE']))
+                print("[Epoch: %s] Training RMSE: %.4f (ETA: %s), Test RMSE: %.4f" %
+                      (str(epoch + 1).zfill(len(str(self.epochs))),
+                       self.train_loss[epoch]['RMSE'],
+                       eta,
+                       self.test_loss[epoch]['RMSE']))
                 tmp_timestamp = datetime.now()
         print(f'Processing Time: {datetime.now() - start}')
 
