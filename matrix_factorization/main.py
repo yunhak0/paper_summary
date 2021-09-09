@@ -3,6 +3,7 @@ import re
 import numpy as np
 from scipy import sparse
 from SVD_integrated import SVD, Asymmetric_SVD, SVDpp, SVD_integrated
+from PMF import PMF
 
 if __name__ == '__main__':
     movielens_dir = './movielens_data'
@@ -39,18 +40,22 @@ if __name__ == '__main__':
 
     test = sparse.csr_matrix((test_r, (test_u, test_i)))
 
-    print('SVD -----------------------------------------------')
-    svd = SVD.SVD(train=train, test=test, random_state=89)
-    svd.fit()
+    # print('SVD -----------------------------------------------')
+    # svd = SVD.SVD(train=train, test=test, random_state=89)
+    # svd.fit()
 
     # print('SVD Asymmetric ------------------------------------')
     # svd_asymmetric = Asymmetric_SVD.Asymmetric_SVD(train=train, test=test, random_state=89)
     # svd_asymmetric.fit()
 
-    print('SVD++ ---------------------------------------------')
-    svd_pp = SVDpp.SVDpp(train=train, test=test, random_state=89)
-    svd_pp.fit()
+    # print('SVD++ ---------------------------------------------')
+    # svd_pp = SVDpp.SVDpp(train=train, test=test, random_state=89)
+    # svd_pp.fit()
 
-    print('SVD Integrated ------------------------------------')
-    svd_integrated = SVD_integrated.SVD_integrated(train=train, test=test, random_state=89)
-    svd_integrated.fit()
+    # print('SVD Integrated ------------------------------------')
+    # svd_integrated = SVD_integrated.SVD_integrated(train=train, test=test, random_state=89)
+    # svd_integrated.fit()
+
+    print('PMF -------------------------------------------------')
+    pmf = PMF.PMF(train=train, test=test, random_state=89)
+    pmf.fit()
