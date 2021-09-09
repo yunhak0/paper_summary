@@ -124,7 +124,7 @@ class SVD_integrated():
         self.sk_i = np.zeros((self.n_item, self.k))
 
     def get_similar(self):
-        rho = utils.sparse_corrcoef(self.R.T)
+        rho = utils.sparse_corrcoef(self.R)
         n_ij = np.dot(self.N.T, self.N)
         rows, cols = n_ij.nonzero()
         s_ij = sparse.lil_matrix((self.n_item, self.n_item))
@@ -238,11 +238,20 @@ class SVD_integrated():
         p_u_ = self.p_u[u] + np.sum(self.y_j[N_u], axis=0)/np.sqrt(len(N_u))
         tier2 = np.dot(p_u_, q_i_T)
         # third tier
-        b_uj = self.mu + self.b_u[u] + self.b_i[Rk_iu]
-        global_optim_w = np.dot((self.R[u, Rk_iu] - b_uj), self.w_ij[i, Rk_iu]).item()
-        offsets_baseline = self.c_ij[i, Nk_iu].sum()
-        tier3 = global_optim_w/np.sqrt(len(Rk_iu)) + offsets_baseline/np.sqrt(len(Nk_iu))
+        if len(Rk_iu) > 0:
+            b_uj = self.mu + self.b_u[u] + self.b_i[Rk_iu]
+            global_optim_w = np.dot((self.R[u, Rk_iu] - b_uj), self.w_ij[i, Rk_iu]).item()
+            global_optim_w = global_optim_w/np.sqrt(len(Rk_iu))
+            
+        else:
+            global_optim_w = 0
         
+        if len(Nk_iu) > 0:
+            offsets_baseline = self.c_ij[i, Nk_iu].sum()
+            offsets_baseline = offsets_baseline/np.sqrt(len(Nk_iu))
+        else:
+            offsets_baseline = 0
+        tier3 = global_optim_w + offsets_baseline
         # predict
         hat_r_ui = tier1 + tier2 + tier3
         self.R_predicted[u, i] = hat_r_ui
@@ -313,8 +322,10 @@ class SVD_integrated():
 
         self.y_j[N_u] = self.y_j[N_u] + self.gamma2 * d_yj
 
-        self.w_ij[i, Rk_iu] = self.w_ij[i, Rk_iu] + self.gamma3 * d_wij
-        self.c_ij[i, Nk_iu] = self.c_ij[i, Nk_iu] + self.gamma3 * d_cij
+        if len(Rk_iu) > 0:
+            self.w_ij[i, Rk_iu] = self.w_ij[i, Rk_iu] + self.gamma3 * d_wij
+        if len(Nk_iu) > 0:
+            self.c_ij[i, Nk_iu] = self.c_ij[i, Nk_iu] + self.gamma3 * d_cij
 
         self.b_u[u] = self.b_u[u] + self.gamma1 * d_bu
         self.b_i[i] = self.b_i[i] + self.gamma1 * d_bi

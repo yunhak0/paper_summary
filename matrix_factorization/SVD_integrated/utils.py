@@ -36,21 +36,27 @@ def sparse_corrcoef(x, y=None):
     Returns:
         ndarray: The correlation coefficient matrix of the variables.
     """
-    if y is not None:
-        x = sparse.vstack((x, y), format='csr')
+    # if y is not None:
+    #     x = sparse.vstack((x, y), format='csr')
 
-    x = x.astype(np.float64)
-    n = x.shape[1]
+    # x = x.astype(np.float64)
+    # n = x.shape[1]
 
-    # Compute the covariance matrix
-    rowsum = x.sum(1)
-    centering = rowsum.dot(rowsum.T.conjugate()) / n
-    C = (x.dot(x.T.conjugate()) - centering) / (n - 1)
+    # # Compute the covariance matrix
+    # rowsum = x.sum(1)
+    # centering = rowsum.dot(rowsum.T.conjugate()) / n
+    # C = (x.dot(x.T.conjugate()) - centering) / (n - 1)
 
-    # The correlation coefficients are given by
-    # C_{i,j} / sqrt(C_{i} * C_{j})
-    d = np.diag(C)
-    coeffs = C / np.sqrt(np.outer(d, d))
-    coeffs = sparse.csr_matrix(coeffs)
+    # # The correlation coefficients are given by
+    # # C_{i,j} / sqrt(C_{i} * C_{j})
+    # d = np.diag(C)
+    # coeffs = C / np.sqrt(np.outer(d, d))
+    # coeffs = sparse.csr_matrix(coeffs)
+    N = x.shape[0]
+    C=((x.T*x -(sum(x).T*sum(x)/N))/(N-1)).todense()
+    V=np.sqrt(np.mat(np.diag(C)).T*np.mat(np.diag(C)))
+    COR = np.divide(C,V+1e-119)
+    COR = sparse.csr_matrix(COR)
+    return COR
 
-    return coeffs
+    # return coeffs
