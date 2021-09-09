@@ -1,27 +1,64 @@
-Factorization Meets the Neighborhood: a Multifaceted Collaborative Filtering Model
-========================================================================================
+# Recomender Systems Summary and Implementation
 
-* Authers: Yehuda Koren
-* Proceedings of the 14th ACM SIGKDD (August 2008)
+The 'README.md'file in each folder is a short summary of each paper.
+For the detailed summary, please refer to the external link in the file.
+The implementation code is in each folder as well.
 
-## Keywords
+The code can be run as following process.
 
-collaborative filtering, recommemder systems, explicit feedback, matrix factorization, neighborhood model, latent factor model, integrated model approach
+```python
+python main.py
+```
 
+```python
+# main.py
 
-## Summary
+if __name__ == '__main__':
+    '''
+    # Import Movie Lens Data
+    ----------------------------------------------------------------
+    '''
+    movielens_dir = './movielens_data'
 
-It is an integrated model approach, neighborbood approach and latent factor model(SVD), in CF field:
+    # Training set Preparation
+    with open(os.path.join(movielens_dir, 'u1.base'), 'r') as f:
+        data = f.readlines()
 
-* Applying global optimization to neighborhood model by replacing user-specific interpolation weights into global weights, changing to sum over all items rated by user
-* Considering implicit feeback in user latent factor vectors in latent factor model(SVD)
-* Integrating two approach by sum of the prediction of ratings of them
+    train_u = []
+    train_i = []
+    train_r = []
+    for l in data:
+        l = re.sub('\n', '', l)
+        l = l.split('\t')
+        train_u.append(np.int64(l[0])-1)
+        train_i.append(np.int64(l[1])-1)
+        train_r.append(np.int64(l[2]))
 
-The model parameters are determined by minimizing the associated regularized square error function through gradient descent
+    train = sparse.csr_matrix((train_r, (train_u, train_i)))
 
-[Detailed Summary](https://www.notion.so/Factorization-Meets-the-Neighborhood-5014b81d066a4aca9fcae42aa40c9274)
+    # Test set preparation
+    with open(os.path.join(movielens_dir, 'u1.test'), 'r') as f:
+            data = f.readlines()
 
+    test_u = []
+    test_i = []
+    test_r = []
+    for l in data:
+        l = re.sub('\n', '', l)
+        l = l.split('\t')
+        test_u.append(np.int64(l[0])-1)
+        test_i.append(np.int64(l[1])-1)
+        test_r.append(np.int64(l[2]))
 
-## Code Usage
+    test = sparse.csr_matrix((test_r, (test_u, test_i)))
 
-[FIXME]
+    '''
+    # Run
+    ----------------------------------------------------------------
+    '''
+    # Algorithm should be changed!
+    print('Algorithm Name --------------------------')
+    model = algorithm.algorithm(train, test, random_state=89)
+    model.fit()
+```
+
