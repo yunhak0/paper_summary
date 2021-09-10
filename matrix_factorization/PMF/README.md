@@ -1,7 +1,7 @@
 # Probabilistic Matrix Factorization (PMF)
 
 * Authers: R. Salakhutdinov and A. Mnih
-* Proceedings of the NeurIPS 2017
+* Proceedings of the NeurIPS 2007
 
 ## Keywords
 
