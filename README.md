@@ -1,8 +1,8 @@
 # Papar Summary of Recommender Systems & Graph Neural Networks
 
-## Recommender Systems
-
 Paper Summary and Self-written code of Recommender Systems
+
+## Recommender Systems
 
 #### Explicit Feedback
 
