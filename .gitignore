@@ -129,10 +129,10 @@ dmypy.json
 .pyre/
 
 # Data folder
-netflix_data/*.txt
-netflix_data/*.csv
-netflix_data/*.pl
-netflix_data/*.tar
-netflix_data/*.npz
+rec_sys/netflix_data/*.txt
+rec_sys/netflix_data/*.csv
+rec_sys/netflix_data/*.pl
+rec_sys/netflix_data/*.tar
+rec_sys/netflix_data/*.npz
 
-movielens_data/*.*
+rec_sys/movielens_data/*.*
