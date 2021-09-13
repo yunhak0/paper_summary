@@ -7,8 +7,8 @@ Paper Summary and Self-written code of Recommender Systems
 #### Explicit Feedback
 
 * Matrix Factorization based
-    + [Factorization Meets the Neighborhood](https://dl.acm.org/doi/10.1145/1401890.1401944) (Y Koren, KDD'08) [[SVD++](https://github.com/yunhak0/rec_sys/tree/cstr_PMF/matrix_factorization/SVD_integrated)]
-    + [Probabilistic Matrix Factorization](https://papers.nips.cc/paper/2007/file/d7322ed717dedf1eb4e6e52a37ea7bcd-Paper.pdf) (A Mnih, RR Salakhutdinov, NIPS'07) [[PMF](https://github.com/yunhak0/rec_sys/tree/cstr_PMF/matrix_factorization/PMF)]
+    + [Factorization Meets the Neighborhood](https://dl.acm.org/doi/10.1145/1401890.1401944) (Y Koren, KDD'08) [[SVD++](rec_sys/matrix_factorization/SVD_integrated)]
+    + [Probabilistic Matrix Factorization](https://papers.nips.cc/paper/2007/file/d7322ed717dedf1eb4e6e52a37ea7bcd-Paper.pdf) (A Mnih, RR Salakhutdinov, NIPS'07) [[PMF](rec_sys/matrix_factorization/SVD_integrated/PMF)]
 
 #### Implicit Feedback
 
