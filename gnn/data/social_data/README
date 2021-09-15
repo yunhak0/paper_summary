@@ -1,0 +1,16 @@
+# Data
+
+## Source
+
+Lei Tang and Huan Liu. Relational Learning via Latent Social Dimensions. In Proceedings of The 15th ACM SIGKDD Conference on Knowledge Discovery and Data Mining (KDD'09), pages 817-826, 2009.
+
+## Detail
+
+Below are some of the data sets we have used for experiments in [2] and [3]. All are in matlab format.  Each data set has two variables: network and groups. "network" is a symmetric sparse matrix representing the interaction between users, and "groups" are the groups subscribed by users. We use that as the class labels in our work.
+
+    BlogCatalog data of 10,312 nodes, 333, 983 links, and 39 categories.
+
+    Flickr Data of 80,513 nodes, 5, 899, 882 links, and 195 categories.
+
+    YouTube Data of 1, 138, 499 nodes, 2, 990, 443 links and 47 categories.
+
