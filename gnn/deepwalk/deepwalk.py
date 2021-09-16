@@ -43,8 +43,18 @@ class deepwalk():
         # Initialize
         self.mat_v_represent = nn.Embedding(len(self.graph), embedding_size)
 
-    def random_walk(self):
-        return self
+    def random_walk(self, node):
+        # Starting Node
+        walk = [node]
+
+        for _ in range(self.walk_length):
+            # Get Neighbors
+            neighbors = list(dict(self.graph[node]).keys())
+            # Select the next node from neighbors
+            node = np.random.choice(neighbors)
+            # Update walk
+            walk.append(node)
+        return walk
 
     def skip_gram(self):
         return self
