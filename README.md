@@ -38,7 +38,7 @@ Paper Summary and Self-written code of Recommender Systems
 
 #### Random Walk
 
-* [Deepwalk: Online Learning of Social Representations](https://arxiv.org/pdf/1403.6652.pdf) (B Perozzi et al., KDD'14) [[Deepwalk]()]
+* [Deepwalk: Online Learning of Social Representations](https://arxiv.org/pdf/1403.6652.pdf) (B Perozzi et al., KDD'14) [[Deepwalk](gnn/deepwalk)]
 * [node2vec: Scalable Feature Learning for Networks](https://arxiv.org/pdf/1607.00653.pdf) (A Grover, J Leskovec, KDD'16) [[node2vec]()]
 * [LINE: Large-scale Information Network Embedding](https://arxiv.org/pdf/1503.03578.pdf) (J Tang et al., WWW'15) [[LINE]()]
 * [metapath2vec: Scalable Representation Learning for Heterogeneous Networks](https://ericdongyx.github.io/papers/KDD17-dong-chawla-swami-metapath2vec.pdf) (Y Dong et al., KDD'17) [[metapath2vec]()]
