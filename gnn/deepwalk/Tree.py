@@ -27,8 +27,8 @@ class Tree:
         self.root = None
 
     def build(self):
-        frequency = self.get_freq()
-        self._make_heap(frequency)
+        self._get_freq()
+        self._make_heap(self.freq)
         self._merge_nodes()
         self._make_codes()
 
@@ -52,11 +52,11 @@ class Tree:
 
     def _make_codes_helper(self, root, current_code):
         if(root is None):
-            return None
+            return 
         if(root.key is not None):
             self.codes[root.key] = current_code
             self.reverse_mapping[current_code] = root.key
-            return None
+            return 
 
         self._make_codes_helper(root.left, current_code + "0")
         self._make_codes_helper(root.right, current_code + "1")

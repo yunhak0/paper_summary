@@ -1,6 +1,9 @@
 import numpy as np
+from scipy import sparse
 from torch.utils.data import Dataset 
 import torch
+
+import Tree
 
 class Graph(Dataset):
     def __init__(self,
@@ -33,8 +36,23 @@ class Graph(Dataset):
 
     def __getitem__(self, idx):
         walk = random_walk(graph=self.graph,
-                           node=self.nodes[idx],
+                           init_node=self.nodes[idx],
                            walk_length=self.walk_length)
+        
+        coded_walk = Tree.Tree(walk)
+        coded_walk.build()
+        tmp = [''] * len(self.graph.nodes)
+        for key, val in coded_walk.codes.items():
+            tmp[key] = val
+            
+
+            
+        
+
+
+        tmp = torch.zeros(len(self.graph.nodes))
+
+        tmp[list(coded_walk.codes.keys())] = list(coded_walk.codes.values())
 
         target = []
         context = []
@@ -48,7 +66,8 @@ class Graph(Dataset):
             target.extend([v_j] * len(u))
             context.extend(u)
 
-        return {'target': torch.LongTensor(target),
+        return {'walk': coded_walk.codes,
+                'target': torch.LongTensor(target),
                 'context': torch.LongTensor(context)}
 
 
