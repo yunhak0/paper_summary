@@ -1,14 +1,34 @@
-import os
-import utils
-from collections import defaultdict
-import numpy as np
-from six import iteritems
-from sklearn.preprocessing import MultiLabelBinarizer
-from sklearn.utils import shuffle as skshuffle
-from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import f1_score
-import deepwalk
+# DeepWalk: Online Learning of Social Representations
 
+* Authors: B. Perozzi, R. Al-Rfou, and S. Skiena
+* Proceedings of the KDD 2014
+
+## Keywords
+
+graph, random walk, language model, word2vec, skipgram
+
+## Summary
+
+It is the implementation of Word2Vec(Skipgram) in node-embedding of Graph domain. The contributions of this methodology are:
+
+* Deep learning as a tool to analyze graphs, to build robust representations
+* Significantly increaed classification performance in the presence of label sparsity
+* The Scalability of algorithm by building representations of web-scale graphs using parallel processing
+
+![](img/img1.png)
+
+[Detailed Summary](https://www.notion.so/DeepWalk-Online-Learning-of-Social-Representations-b843fd5070864c31b1c36696cd9b26cf)
+
+## Usage
+
+The code can be run as following process.
+
+```bash
+python main.py
+```
+
+```python
+# main.py
 
 def main():
     data_dir = './gnn/data/social_data'
@@ -110,3 +130,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+```

@@ -23,14 +23,3 @@ class random_walk:
             walk.append(node)
         
         return [str(node) for node in walk]
-
-    # def run(self):
-    #     walks = []
-    #     nodes = list(self.graph.nodes())
-
-    #     for _ in tqdm(range(self.walks_per_vertex)):
-    #         np.random.shuffle(nodes)
-    #         for node in nodes:
-    #             walks.append(self._random_walk(init_node=node))
-
-    #     return walks
