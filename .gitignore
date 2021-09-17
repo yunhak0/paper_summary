@@ -136,3 +136,7 @@ rec_sys/netflix_data/*.tar
 rec_sys/netflix_data/*.npz
 
 rec_sys/movielens_data/*.*
+
+gnn/data/cora_data/*.*
+
+*.mat
