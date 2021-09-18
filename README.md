@@ -15,7 +15,7 @@ Paper Summary and Self-written code of Recommender Systems
 * Matrix Factorization based
     + [Collaborative Filtering for Implicit Feedback Datasets](http://yifanhu.net/PUB/cf.pdf) (Y Hu et al., ICDM'08) ~~[[OCCF]()]~~ (TBU)
     + [BPR: Bayesian Personalized Ranking from Implicit Feedback](https://arxiv.org/abs/1205.2618) (S Rendle et al., arXiv'12) ~~[[BPR]()]~~ (TBU)
-* Metrix Learning based
+* Metric Learning based
     + [Collaborative Metric Learning](https://dl.acm.org/doi/10.1145/3038912.3052639) (CK Hsieh et al., WWW'17) ~~[[CML]()]~~ (TBU)
 * Neural Network based
     + [Neural Collaborative Filtering](https://dl.acm.org/doi/10.1145/3038912.3052569) (X He et al., WWW'17) ~~[[NCF]()]~~ (TBU)
