@@ -44,10 +44,6 @@ if __name__ == '__main__':
     # svd = SVD.SVD(train=train, test=test, random_state=89)
     # svd.fit()
 
-    # print('SVD Asymmetric ------------------------------------')
-    # svd_asymmetric = Asymmetric_SVD.Asymmetric_SVD(train=train, test=test, random_state=89)
-    # svd_asymmetric.fit()
-
     # print('SVD++ ---------------------------------------------')
     # svd_pp = SVDpp.SVDpp(train=train, test=test, random_state=89)
     # svd_pp.fit()
