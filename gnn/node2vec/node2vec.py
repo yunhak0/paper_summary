@@ -37,7 +37,7 @@ class Graph:
                     walk.append(nxt_node)
             else:
                 break
-        return walk
+        return [str(node) for node in walk]
 
     def run_walk(self, num_walks, walk_length):
         walks = []
@@ -84,7 +84,6 @@ class Graph:
         self.alias_edges = alias_edges
 
     def fit(self, walks):
-        walks = [map(str, walk) for walk in walks]
         model = Word2Vec(walks, size=self.dim, window=self.window_size,
                          min_count=0, sg=1, workers=cpu_count(),
                          iter=self.n_epochs)
