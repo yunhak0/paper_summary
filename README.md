@@ -46,7 +46,7 @@ Paper Summary and Self-written code of Recommender Systems
 #### Graph Neural Network
 
 * Supervised
-    + [GCN: Semi-Supervised Classification with Graph Convolution Networks](https://openreview.net/pdf?id=SJU4ayYgl) (TN. Kipf, M Welling, ICLR'17) ~~[[GCN]()]~~ (TBU)
+    + [GCN: Semi-Supervised Classification with Graph Convolution Networks](https://openreview.net/pdf?id=SJU4ayYgl) (TN. Kipf, M Welling, ICLR'17) [[GCN](gnn/gcn)]
     + [GAT: Graph Attention Networks](https://arxiv.org/pdf/1710.10903.pdf) (P Velickovic et al., ICLR'18) ~~[[GAT]()]~~ (TBU)
 
 * Unsupervised
