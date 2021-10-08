@@ -140,3 +140,6 @@ rec_sys/movielens_data/*.*
 gnn/data/cora_data/*.*
 
 *.mat
+
+# VS CODE Workspace
+*.code-workspace
