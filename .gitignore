@@ -143,3 +143,5 @@ gnn/data/cora_data/*.*
 
 # VS CODE Workspace
 *.code-workspace
+
+*.pkl
