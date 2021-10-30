@@ -5,74 +5,167 @@ from torch.nn.parameter import Parameter
 from torch.nn import functional as F
 from torch.nn import Module
 
-class GATLayer(Module):
-    def __init__(self, in_feature, out_feature, n_attention,
-                 concat=True,
-                 neg_input_slope=0.02,
-                 dropout=0.06):
-        super(GATLayer, self).__init__()
-        self.in_feature = in_feature
-        self.out_feature = out_feature
-        self.n_attention = n_attention
-        self.concat = concat
-        self.neg_input_slope = neg_input_slope
+
+# Inspired by 
+# https://github.com/PetarV-/GAT
+# https://github.com/Diego999/pyGAT
+# https://github.com/gordicaleksa/pytorch-GAT
+
+class GATAttn(Module):
+    def __init__(self, n_F_in, n_F_out, n_heads,
+                 leaky_relu_alpha=0.2,
+                 dropout=0.6,
+                 activation=nn.ELU(),
+                 skip_connection=False):
+        super().__init__()
+        self.n_F_in = n_F_in
+        self.n_F_out = n_F_out
+        self.n_heads = n_heads
+        self.leaky_relu_alpha = leaky_relu_alpha
         self.dropout = dropout
-        self.weight = Parameter(torch.FloatTensor(in_feature, out_feature))
-        self.attention_weight = Parameter(torch.FloatTensor(2 * out_feature, 1))
+        self.activation = activation
+        self.skip_connection = skip_connection
+
+        self.leaky_relu = nn.LeakyReLU(self.leaky_relu_alpha)
+
+        # Weight matrix: W
+        self.W = Parameter(torch.FloatTensor(n_F_in, n_F_out))
+        # Attention mechanism: a
+        self.a = Parameter(torch.FloatTensor(2 * n_F_out, 1))
+        # Skip Connection
+        if skip_connection:
+            self.skip_proj = nn.Linear(n_F_in, n_F_out * n_heads, bias=False)
+        else:
+            self.register_parameter('skip_proj', None)
+        
+        # Initialize the parameters
         self.reset_parameters()
 
-        self.leakyrelu = nn.LeakyReLU(self.neg_input_slope)
-
     def reset_parameters(self):
-        nn.init.xavier_normal_(self.weight)
-        nn.init.xavier_normal_(self.attention_weight)
+        nn.init.xavier_normal_(self.W)
+        nn.init.xavier_normal_(self.a)
 
     def forward(self, x, adj):
-        Wh = torch.matmul(x, self.weight)
-        e_ij = self._attention_coef(Wh)
+        if self.dropout != 0.0:
+            x = F.dropout(x, self.dropout, training=self.training)
+        Wh = torch.mm(x, self.W)
 
-        # Select Neighbors
-        zeros = -9e15 * torch.ones(e_ij)
-        attention = torch.where(adj > 0, e_ij, zeros)
-        attention = F.softmax(attention, dim=1)
-        attention = F.dropout(attention, self.dropout, training=self.training)
+        # Attention
+        e_ij = self._get_attention_coef(Wh, adj)
+        attention = F.softmax(e_ij, dim=1)
+        if self.dropout != 0.0:
+            attention = F.dropout(attention, self.dropout, training=self.training)
 
-        h_prime = torch.matmul(attention, Wh) # N x F'
+        # Weighted Feature
+        if self.dropout != 0.0:
+            Wh = F.dropout(Wh, self.dropout, training=self.training)
 
+        h_prime_init = torch.matmul(attention, Wh)
+
+        # Skip Connection
+        if self.skip_connection:
+            if h_prime_init.shape[-1] == x.shape[-1]:
+                h_prime_init += x
+            else:
+                h_prime_init += self.skip_proj(x)
+
+        # Apply nonlinearity activation function
+        if self.activation is not None:
+            h_prime_init = self.activation(h_prime_init)
+
+        return h_prime_init
+
+    def _get_attention_coef(self, Wh, adj):
+        Wh_i = torch.matmul(Wh, self.a[:self.n_F_out, :])
+        Wh_j = torch.matmul(Wh, self.a[self.n_F_out:, :])
+        e_ij = self.leaky_relu(Wh_i + Wh_j.T)
+
+        # Masked attention coef
+        zeros = -9e15 * torch.ones_like(e_ij)
+        e_ij = torch.where(adj > 0, e_ij, zeros)
+
+        return e_ij
+
+
+class GATLayer(GATAttn):
+    def __init__(self, n_F_in, n_F_out, n_heads,
+                 leaky_relu_alpha=0.2,
+                 dropout=0.6,
+                 activation=nn.ELU(),
+                 skip_connection=False,
+                 concat=True):
+        super().__init__()
+        self.n_F_in = n_F_in
+        self.n_F_out = n_F_out
+        self.n_heads = n_heads
+        self.leaky_relu_alphay = leaky_relu_alpha
+        self.dropout = dropout
+        self.activation = activation
+        self.skip_connection = skip_connection
+        self.concat = concat
+
+        # Multi-heads Attention
+        self.attentions = [GATAttn(n_F_in, n_F_out, n_heads,
+                                   leaky_relu_alpha, dropout, activation,
+                                   skip_connection)
+                           for _ in range(n_heads)]
+
+        for i, attn in enumerate(self.attentions):
+            self.add_module('attention_{}'.format(i), attn)
+
+    def forward(self, x, adj):
         if self.concat:
-            h_prime = F.elu(h_prime)
-        
-        return h_prime
-    
-    def _attention_coef(self, Wh):
-        Wh_i = torch.matmul(Wh, self.attention_weight[:self.out_feature, :])
-        Wh_j = torch.matmul(Wh, self.attention_weight[self.out_feature:, :])
-        e_ij = self.leakyrelu(Wh_i + Wh_j.T)
-        return e_ij  # N x N
+            h_prime = torch.cat([attn_i(x, adj) for attn_i in self.attentions], dim=1)
+        else:
+            h_prime = [attn_i(x, adj) for attn_i in self.attentions]
+            h_prime = h_prime.sum() / self.n_heads
 
-class GAT(Module):
-    def __init__(self, n_feature, n_hidden, n_class, dropout, negative_slope, n_head):
-        super(GAT, self).__init__()
+        return h_prime
+
+
+class GAT(GATLayer):
+    def __init__(self, n_layers, n_feature, n_hidden, n_class,
+                 n_heads,
+                 leaky_relu_alpha=0.2,
+                 dropout=0.6,
+                 activation=nn.ELU(),
+                 skip_connection=False,
+                 concat=True):
+        super().__init__()
+        assert len(n_heads) == 2, "The 'n_heads' is the list that has 2 elements: [building block layer, final layer]."
+        self.n_layers = n_layers
         self.n_feature = n_feature
         self.n_hidden = n_hidden
         self.n_class = n_class
+        self.n_heads = n_heads
+        self.leaky_relu_alpha = leaky_relu_alpha
         self.dropout = dropout
-        self.negative_slope = negative_slope
-        self.n_head = n_head
+        self.activation = activation
+        self.skip_connection = skip_connection
+        self.concat = concat
 
-        self.attentions = [GATLayer(n_feature, n_hidden, n_head, concat=True,
-                                    neg_input_slope=negative_slope, dropout=dropout)
-                           for _ in range(n_head)]
-        for i, attention in enumerate(self.attentions):
-            self.add_module('attention_{}'.format(i), attention)
-        
-        self.final_attention = GATLayer(n_hidden * n_head, n_class, concat=False,
-                                        neg_input_slope=negative_slope, dropout=dropout)
+        # Building Block Layers
+        layers = [GATLayer(n_F_in=n_feature, n_F_out=n_hidden,
+                           n_heads=n_heads[0],
+                           leaky_relu_alpha=leaky_relu_alpha,
+                           dropout=dropout,
+                           activation=activation,
+                           skip_connection=skip_connection,
+                           concat=concat)
+                  for _ in range(n_layers - 1)]
+
+        # Final Layer
+        final_layer = GATLayer(n_F_in=n_hidden * n_heads[0],
+                               n_F_out=n_class,
+                               n_heads=n_heads[1],
+                               leaky_relu_alpha=leaky_relu_alpha,
+                               dropout=dropout,
+                               activation=None,
+                               skip_connection=skip_connection,
+                               concat=False)
+        layers.append(final_layer)
+
+        self.gat = nn.Sequential(*layers)
 
     def forward(self, x, adj):
-        x = F.dropout(x, self.dropout, training=self.training)
-        x = torch.cat([attention(x, adj) for attention in self.attentions], dim=1)
-        x = F.dropout(x, self.dropout, training=self.training)
-        x = F.elu(self.final_attention(x, adj))
-        x = F.log_softmax(x, dim=1)
-        return x
+        return self.gat(x, adj)
