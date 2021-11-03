@@ -139,9 +139,13 @@ rec_sys/movielens_data/*.*
 
 gnn/data/cora_data/*.*
 
+gnn/gat/data/
+
 *.mat
 
 # VS CODE Workspace
 *.code-workspace
 
 *.pkl
+
+*.pth

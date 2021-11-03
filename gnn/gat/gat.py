@@ -17,7 +17,7 @@ class GATAttn(Module):
                  dropout=0.6,
                  activation=nn.ELU(),
                  skip_connection=False):
-        super().__init__()
+        super(GATAttn, self).__init__()
         self.n_F_in = n_F_in
         self.n_F_out = n_F_out
         self.n_heads = n_heads
@@ -45,7 +45,8 @@ class GATAttn(Module):
         nn.init.xavier_normal_(self.W)
         nn.init.xavier_normal_(self.a)
 
-    def forward(self, x, adj):
+    def forward(self, data):
+        x, adj = data
         if self.dropout != 0.0:
             x = F.dropout(x, self.dropout, training=self.training)
         Wh = torch.mm(x, self.W)
@@ -73,7 +74,7 @@ class GATAttn(Module):
         if self.activation is not None:
             h_prime_init = self.activation(h_prime_init)
 
-        return h_prime_init
+        return (h_prime_init, adj)
 
     def _get_attention_coef(self, Wh, adj):
         Wh_i = torch.matmul(Wh, self.a[:self.n_F_out, :])
@@ -87,14 +88,14 @@ class GATAttn(Module):
         return e_ij
 
 
-class GATLayer(GATAttn):
+class GATLayer(Module):
     def __init__(self, n_F_in, n_F_out, n_heads,
                  leaky_relu_alpha=0.2,
                  dropout=0.6,
                  activation=nn.ELU(),
                  skip_connection=False,
                  concat=True):
-        super().__init__()
+        super(GATLayer, self).__init__()
         self.n_F_in = n_F_in
         self.n_F_out = n_F_out
         self.n_heads = n_heads
@@ -113,17 +114,18 @@ class GATLayer(GATAttn):
         for i, attn in enumerate(self.attentions):
             self.add_module('attention_{}'.format(i), attn)
 
-    def forward(self, x, adj):
+    def forward(self, data):
+        _, adj = data
         if self.concat:
-            h_prime = torch.cat([attn_i(x, adj) for attn_i in self.attentions], dim=1)
+            h_prime = torch.cat([attn_i(data)[0] for attn_i in self.attentions], dim=1)
         else:
-            h_prime = [attn_i(x, adj) for attn_i in self.attentions]
-            h_prime = h_prime.sum() / self.n_heads
+            h_prime = [attn_i(data)[0] for attn_i in self.attentions]
+            h_prime = sum(h_prime) / self.n_heads
 
-        return h_prime
+        return (h_prime, adj)
 
 
-class GAT(GATLayer):
+class GAT(Module):
     def __init__(self, n_layers, n_feature, n_hidden, n_class,
                  n_heads,
                  leaky_relu_alpha=0.2,
@@ -144,15 +146,24 @@ class GAT(GATLayer):
         self.skip_connection = skip_connection
         self.concat = concat
 
-        # Building Block Layers
+        # Initial Layer
         layers = [GATLayer(n_F_in=n_feature, n_F_out=n_hidden,
                            n_heads=n_heads[0],
                            leaky_relu_alpha=leaky_relu_alpha,
                            dropout=dropout,
                            activation=activation,
-                           skip_connection=skip_connection,
-                           concat=concat)
-                  for _ in range(n_layers - 1)]
+                           skip_connection=False,
+                           concat=concat)]
+
+        # Building Block Layers
+        middle_layers = [GATLayer(n_F_in=n_feature, n_F_out=n_hidden,
+                                  n_heads=n_heads[0],
+                                  leaky_relu_alpha=leaky_relu_alpha,
+                                  dropout=dropout,
+                                  activation=activation,
+                                  skip_connection=skip_connection,
+                                  concat=concat)
+                         for _ in range(1, n_layers - 1)]
 
         # Final Layer
         final_layer = GATLayer(n_F_in=n_hidden * n_heads[0],
@@ -163,9 +174,11 @@ class GAT(GATLayer):
                                activation=None,
                                skip_connection=skip_connection,
                                concat=False)
+        if middle_layers != []:
+            layers.append(middle_layers)
         layers.append(final_layer)
 
-        self.gat = nn.Sequential(*layers)
+        self.gat_fin = nn.Sequential(*layers)
 
-    def forward(self, x, adj):
-        return self.gat(x, adj)
+    def forward(self, data):
+        return self.gat_fin(data)
