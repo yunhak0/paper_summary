@@ -47,7 +47,7 @@ Paper Summary and Self-written code of Recommender Systems
 
 * Supervised
     + [GCN: Semi-Supervised Classification with Graph Convolution Networks](https://openreview.net/pdf?id=SJU4ayYgl) (TN. Kipf, M Welling, ICLR'17) [[GCN](gnn/gcn)]
-    + [GAT: Graph Attention Networks](https://arxiv.org/pdf/1710.10903.pdf) (P Velickovic et al., ICLR'18) ~~[[GAT]()]~~ (TBU)
+    + [GAT: Graph Attention Networks](https://arxiv.org/pdf/1710.10903.pdf) (P Velickovic et al., ICLR'18) [[GAT](gnn/gat)]
 
 * Unsupervised
     + [DGI: Deep Graph Infomax](https://arxiv.org/abs/1809.10341) (P Velickovic et al., ICLR'19) [[DGI](gnn/dgi)]
