@@ -138,7 +138,7 @@ rec_sys/netflix_data/*.npz
 rec_sys/movielens_data/*.*
 
 gnn/data/cora_data/*.*
-
+gnn/data/ppi_data/*.*
 gnn/gat/data/
 
 *.mat

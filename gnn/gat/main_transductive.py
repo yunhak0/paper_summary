@@ -1,5 +1,4 @@
 import time
-from torch._C import device
 import utils
 import numpy as np
 from arguments import parse_args
@@ -13,9 +12,10 @@ def main():
     args = parse_args()
 
     # Set Up Seed
-    torch.manual_seed(args.seed)
-    torch.cuda.manual_seed_all(args.seed)
-    np.random.seed(args.seed)
+    if args.seed is not None:
+        torch.manual_seed(args.seed)
+        torch.cuda.manual_seed_all(args.seed)
+        np.random.seed(args.seed)
 
     # Device
     my_device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -32,10 +32,10 @@ def main():
 
     my_gat = gat.GAT(
         n_layers=args.n_layers,
-        n_feature=features.shape[1],
-        n_hidden=args.n_hidden,
+        n_features=features.shape[1],
+        n_hiddens=args.n_hidden,
         n_class=len(labels.unique()),
-        n_heads=[args.n_heads, args.n_heads_final_layer],
+        n_attn_heads=[args.n_heads, args.n_heads_final_layer],
         leaky_relu_alpha=args.leaky_relu_alpha,
         dropout=args.dropout,
         activation=nn.ELU(),
@@ -77,7 +77,7 @@ def main():
             pred_class_val = torch.argmax(unnorm_node_class_scores_val, dim=-1)
             acc_val = torch.sum(torch.eq(pred_class_val, lbl_val).long()).item() / len(lbl_val)
 
-        if epoch % 10 == 0 or epoch == args.n_epochs -1:
+        if epoch % 100 == 0 or epoch == args.n_epochs -1:
             print('Epoch: {:04d}'.format(epoch+1),
                   '| Training Loss: {:.4f}'.format(loss.item()),
                   '| Training Acc: {:.4f}'.format(acc),
@@ -97,6 +97,9 @@ def main():
 
     print('Optimization Finished!')
     print('Total time elapsed: {:.4f}s'.format(time.time() - start))
+    print('BEST VALIDATION SCORE',
+                  '| Best Val Loss: {:.4f}'.format(BEST_VAL_LOSS),
+                  '| Best Val Acc: {:.4f}'.format(BEST_VAL_ACC))
 
     # Test
     my_gat.eval()
