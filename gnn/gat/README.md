@@ -16,5 +16,9 @@ graph, attention, neural networks, convolutional networks, inductive, transducti
 The code can be run as following process.
 
 ```bash
-python main.py
+# Transductive Task (cora)
+python main_transductive.py
+
+# Inductive Task (ppi)
+python main_inductive.py
 ```
