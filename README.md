@@ -51,8 +51,8 @@ Paper Summary and Self-written code of Recommender Systems
 
 * Unsupervised
     + [DGI: Deep Graph Infomax](https://arxiv.org/abs/1809.10341) (P Velickovic et al., ICLR'19) [[DGI](gnn/dgi)]
-    + [GVAE: Variational Graph Auto-Encoders](https://arxiv.org/abs/1611.07308) (TN. Kipf, M Welling, arXiv) ~~[[GVAE]()]~~ (TBU)
-        + [VAE: Auto-Encoding Variational Bayes](https://arxiv.org/abs/1312.6114) (D P Kingma, M Welling, arXiv) ~~[[VAE]()]~~ (TBU)
+    + [GVAE: Variational Graph Auto-Encoders](https://arxiv.org/abs/1611.07308) (TN. Kipf, M Welling, arXiv) [[GVAE](gnn/vgae)]
+        + [VAE: Auto-Encoding Variational Bayes](https://arxiv.org/abs/1312.6114) (DP. Kingma, M Welling, arXiv)
     + [GraphSAGE: Inductive Representation Learning on Large Graphs](https://arxiv.org/pdf/1706.02216.pdf) (W L. Hamilton et al., NIPS'17) ~~[[GraphSAGE]()]~~ (TBU)
 
 #### Knowledge Graph Embedding
