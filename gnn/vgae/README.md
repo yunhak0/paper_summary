@@ -22,4 +22,5 @@ python main.py
 ## Reference
 
 > https://github.com/tkipf/gae
+>
 > https://github.com/DaehanKim/vgae_pytorch
