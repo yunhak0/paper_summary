@@ -18,3 +18,8 @@ The code can be run as following process:
 ```bash
 python main.py
 ```
+
+## Reference
+
+> https://github.com/tkipf/gae
+> https://github.com/DaehanKim/vgae_pytorch

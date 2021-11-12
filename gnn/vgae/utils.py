@@ -192,7 +192,7 @@ def get_train_acc(A_preds, adj_label):
     def sigmoid(x):
         return 1 / (1 + torch.exp(-x))
     labels = adj_label.view(-1).long()
-    preds = (sigmoid(A_preds) > 0.5).view(-1).long()
+    preds = (A_preds > 0.5).view(-1).long()
     acc = (preds == labels).sum().float() / labels.size(0)
 
     return acc

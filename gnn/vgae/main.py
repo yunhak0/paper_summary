@@ -44,6 +44,10 @@ def main():
     adj_norm = torch.FloatTensor(adj_norm.todense()).to(my_dev)
     adj_label = torch.FloatTensor(adj_label.todense()).to(my_dev)
     features = torch.FloatTensor(features.todense()).to(my_dev)
+    
+    wgt_mask = adj_label == 1
+    wgt_tensor = torch.ones(wgt_mask.size(0), wgt_mask.size(1)).to(my_dev)
+    wgt_tensor[wgt_mask] = pos_weight.item()
 
     gae_model = vgae.gae(in_features, args.n_hidden, args.dim_z).to(my_dev)
     vgae_model = vgae.vgae(in_features, args.n_hidden, args.dim_z).to(my_dev)
@@ -52,12 +56,8 @@ def main():
     opt_vgae = optim.Adam(vgae_model.parameters(), lr=args.lr)
 
     BEST_GAE_VAL_SCORE = 0
-    BEST_GAE_VAL_LOSS = 0
+    BEST_GAE_VAL_LOSS = 10000
     PATIENCE_GAE_CNT = 0
-
-    BEST_VGAE_VAL_SCORE = 0
-    BEST_VGAE_VAL_LOSS = 0
-    PATIENCE_VGAE_CNT = 0
 
     # GAE Training
     print('GAE TRAINING -----')
@@ -65,10 +65,10 @@ def main():
     for epoch in range(args.n_epochs):
         t = time.time()
 
-        #gae_model.train()
+        gae_model.train()
         opt_gae.zero_grad()
         gae_outs = gae_model(features, adj_norm)
-        gae_loss = gae_model.loss(gae_outs, adj_label, pos_weight, norm)
+        gae_loss = gae_model.loss(gae_outs, adj_label, wgt_tensor, norm)
         gae_loss.backward()
         opt_gae.step()
 
@@ -101,9 +101,56 @@ def main():
 
     test_roc, test_avg_prec = utils.get_scores(gae_outs, adj_org, test_edges, test_edges_false)
     print('GAE TEST SCORE',
-          '| Test Loss: {:.4f}'.format(test_roc),
-          '| Test ROC AUC: {:.4f}'.format(test_avg_prec))
+          '| Test ROC AUC: {:.4f}'.format(test_roc),
+          '| Test AVG PRECISION: {:.4f}'.format(test_avg_prec))
 
+
+    # VGAE start
+    BEST_VGAE_VAL_SCORE = 0
+    BEST_VGAE_VAL_LOSS = 10000
+    PATIENCE_VGAE_CNT = 0
+    print('VGAE TRAINING -----')
+    for epoch in range(args.n_epochs):
+        t = time.time()
+
+        vgae_model.train()
+        opt_vgae.zero_grad()
+        vgae_outs = vgae_model(features, adj_norm)
+        vgae_loss = vgae_model.loss(vgae_outs, adj_label, n_nodes, wgt_tensor, norm)
+        vgae_loss.backward()
+        opt_vgae.step()
+
+        train_acc = utils.get_train_acc(vgae_outs, adj_label)
+        val_roc, val_avg_prec = utils.get_scores(vgae_outs, adj_label, val_edges, val_edges_false)
+
+        print("Epoch:", '%04d' % (epoch + 1),
+              "train_loss=", "{:.5f}".format(vgae_loss.item()),
+              "train_acc=", "{:.5f}".format(train_acc),
+              "val_roc=", "{:.5f}".format(val_roc),
+              "val_ap=", "{:.5f}".format(val_avg_prec),
+              "time=", "{:.5f}".format(time.time() - t))
+
+        if val_roc > BEST_VGAE_VAL_SCORE or gae_loss.item() < BEST_VGAE_VAL_LOSS:
+            BEST_VGAE_VAL_SCORE = max(val_roc, BEST_VGAE_VAL_SCORE)
+            BEST_VGAE_VAL_LOSS = min(vgae_loss.item(), BEST_VGAE_VAL_LOSS)
+            PATIENCE_VGAE_CNT = 0
+        else:
+            PATIENCE_VGAE_CNT += 1
+        
+        if PATIENCE_VGAE_CNT > 100:
+            print('Stopping the training due to patience setting')
+            break
+
+    print('Optimization Finished!')
+    print('Total time elapsed: {:.4f}s'.format(time.time() - start))
+    print('BEST VGAE VALIDATION SCORE',
+            '| Best Val Loss: {:.4f}'.format(BEST_VGAE_VAL_LOSS),
+            '| Best Val ROC AUC: {:.4f}'.format(BEST_VGAE_VAL_SCORE))
+
+    test_roc, test_avg_prec = utils.get_scores(vgae_outs, adj_org, test_edges, test_edges_false)
+    print('VGAE TEST SCORE',
+          '| Test ROC AUC: {:.4f}'.format(test_roc),
+          '| Test AVG PRECISION: {:.4f}'.format(test_avg_prec))
 
 if __name__ == '__main__':
     main()
